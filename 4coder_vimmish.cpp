@@ -5061,6 +5061,8 @@ function void vim_draw_cursor(Application_Links *app, View_ID view, b32 is_activ
     }
 }
 
+function void primitive_highlight_draw_cpp_token_colors( Application_Links *app, Text_Layout_ID text_layout_id, Token_Array *array, Buffer_ID buffer );
+
 function void vim_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id, Buffer_ID buffer, Text_Layout_ID text_layout_id, Rect_f32 rect) {
     ProfileScope(app, "render buffer");
     
@@ -5071,7 +5073,8 @@ function void vim_render_buffer(Application_Links *app, View_ID view_id, Face_ID
     // NOTE(allen): Token colorizing
     Token_Array token_array = get_token_array_from_buffer(app, buffer);
     if (token_array.tokens != 0){
-        draw_cpp_token_colors(app, text_layout_id, &token_array);
+        //draw_cpp_token_colors(app, text_layout_id, &token_array);
+        primitive_highlight_draw_cpp_token_colors( app, text_layout_id, &token_array, buffer );
         
         // NOTE(allen): Scan for TODOs and NOTEs
         if (global_config.use_comment_keyword){
@@ -5419,7 +5422,11 @@ function void vim_render_caller(Application_Links *app, Frame_Info frame_info, V
     
     // NOTE(allen): draw line numbers
     if (global_config.show_line_number_margins){
-        draw_line_number_margin(app, view_id, buffer, face_id, text_layout_id, line_number_rect);
+        if(use_relative_line_number_mode) {
+            draw_relative_line_number_margin(app, view_id, buffer, face_id, text_layout_id, line_number_rect);
+        } else {
+            draw_line_number_margin(app, view_id, buffer, face_id, text_layout_id, line_number_rect);
+        }
     }
     
     // NOTE(allen): draw the buffer
